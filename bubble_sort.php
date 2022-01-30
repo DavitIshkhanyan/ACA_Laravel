@@ -1,28 +1,20 @@
 <?php
 
-function debug($var)
-{
-    echo "<pre>";
-    print_r($var);
-    echo '</pre> <br>';
-}
+$arr = $_POST["array"];
+$count = count($arr);
 
-$arr = [5, 3, 9, 4];
-//$temp = 0;
-function bubble_sort($arr): array
+function bubbleSort ($arr, $n)
 {
-    for ($i = 0; $i < sizeof($arr); $i++) {
-        for ($j = $i; $j < sizeof($arr); $j++) {
-            if ($arr[$i] > $arr[$j]) {
-                [$arr[$i], $arr[$j]] = [$arr[$j], $arr[$i]];
-//                $temp = $arr[$i];
-//                $arr[$i] = $arr[$j];
-//                $arr[$j] = $temp;
+    for($i = 0; $i < $n; $i++) {
+        for($j = 0; $j < $n - $i - 1; $j++) {
+            if($arr[$j] > $arr[$j + 1]) {
+                $temp = $arr[$j];
+                $arr[$j] = $arr[$j + 1];
+                $arr[$j + 1] = $temp;
             }
         }
     }
     return $arr;
 }
 
-debug(bubble_sort($arr));
-
+print_r(bubbleSort($arr, $count));
