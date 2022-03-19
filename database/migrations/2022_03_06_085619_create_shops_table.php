@@ -21,8 +21,8 @@ class CreateShopsTable extends Migration
             $table->string('address')->nullable();
             $table->string('phone_number')->nullable();
             $table->string('email');
-            $table->float('rating')->nullable();
             $table->string('manager_name');
+            $table->float('rating')->nullable();
             $table->timestamps();
         });
     }
@@ -37,3 +37,18 @@ class CreateShopsTable extends Migration
         Schema::dropIfExists('shops');
     }
 }
+//user_id,name,description,adress,phone,mail,meneger,reyting
+
+// logging
+
+
+// produt - shop_id, category_id, name, description, price, count, rating
+//images table - product_id - image
+
+// pph artisan make:controller ProductController --api
+
+// HomeWork //
+// validation product, shop, category
+// sarqel category show shop show-i nman
+
+// migracianeri mej karox e linel edit_..._table

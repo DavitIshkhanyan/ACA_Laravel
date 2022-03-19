@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
+use PhpParser\Error;
 
 class UserType
 {
@@ -17,12 +18,12 @@ class UserType
      */
     public function handle(Request $request, Closure $next, $type)
     {
-//        dd(auth()->user()->type);
-        if (User::TYPE_SLUGS[auth()->user()->type] !== $type) {
-            abort(404);
-//            dd('You are buyer');
+//        dd(auth());
+        if (User::TYPE_SLUGS[auth()->user()->{'type'}] === $type) {
+            return $next($request);
         }
-//        dd('You are seller');
-        return $next($request);
+        abort(404);
+
+//        dd($request, $next);
     }
 }

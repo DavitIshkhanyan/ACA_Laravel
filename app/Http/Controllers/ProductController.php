@@ -2,39 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\StoreProductRequest;
-use App\Http\Requests\UpdateCategoryRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\Shop;
-use http\Env\Response;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index()
-    {
-        if (Product::all()->isEmpty()) {
-            return response()->json([
-                'message' => 'No data to be shown.']);
-        }
-        return response()->json([
-            'data' => Product::all()]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function index()
     {
         //
     }
@@ -42,20 +23,25 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  \App\Http\Requests\StoreProductRequest  $request
+     * @return JsonResponse
      */
     public function store(StoreProductRequest $request)
     {
-        if (auth()->id()) {
-            if (auth()->id() === Shop::findOrFail($request->shop_id)->user_id) {
-                Product::create($request->all());
-                return response()->json('New Product added successfully.');
+        try {
+            $shop = Shop::find($request->shop_id);
+//            dd(auth()->id(), $product->user_id);
+            if (auth()->id() === $shop->user_id) {
+                $inputs = $request->all();
+                $obj = new Product();
+                $obj->fill($inputs);
+                $obj->save();
+                return response()->json(['message' => 'succes', 'status' => 1]);
             } else {
-                return response()->json('Invalid shop id.');
+                return response()->json(['message' => 'You have no permission', 'status' => '0']);
             }
-        } else {
-            return response()->json('Please login.');
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => 0], 500);
         }
     }
 
@@ -63,59 +49,41 @@ class ProductController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
-    public function show($id)
+    public function show(Product $product)
     {
-        try {
-            $data = Product::findOrFail($id);
-            return \response()->json($data);
-        } catch (\Exception $e) {
-            return response()->json("Invalid id, " . $e->getMessage());
-        }
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Product $product)
-    {
-        //
+            try {
+                return response()->json([
+                    'message' => 'succes',
+                    'status' => 1,
+                    'product' => Product::find($product)
+                ]);
+            } catch (\Exception $e) {
+                return response()->json(['message' => $e->getMessage(), 'status' => 0], 500);
+            }
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\UpdateProductRequest  $request
      * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
-    public function update(UpdateProductRequest $request, $id)
+    public function update(UpdateProductRequest $request, Product $product)
     {
-        try {
-            Product::findOrFail($id)->update($request->all());
-            return response()->json('Changes made successfully.');
-        } catch (\Exception $e) {
-            return response()->json('Invalid id, ' . $e->getMessage());
-        }
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Product $product)
     {
-        try {
-            Product::findOrFail($id)->delete();
-            return response()->json("Deleted id $id.");
-        } catch (\Exception $e) {
-            return response()->json("Invalid id, " . $e->getMessage());
-        }
+        //
     }
 }

@@ -5,34 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreShopRequest;
 use App\Http\Requests\UpdateShopRequest;
 use App\Models\Shop;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
-use function PHPUnit\Framework\returnArgument;
 
 class ShopController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index()
-    {
-        if (Shop::all()->isEmpty()) {
-            return response()->json([
-                'message' => 'No data to be shown.']);
-        }
-        return response()->json([
-            'data' => Shop::all()]);
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function index()
     {
         //
     }
@@ -40,88 +23,72 @@ class ShopController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  \App\Http\Requests\StoreShopRequest  $request
+//     * @return \Illuminate\Http\Response
+     * @return JsonResponse
      */
     public function store(StoreShopRequest $request)
     {
-        Shop::create($request->all());
-        return response()->json(
-            'New Shop added successfully.');
+        try {
+            $userId = auth()->id();
+//            $userId = auth()->user()->first_name;
+//            dd($userId);
+            $inputs = $request->all();
+            $inputs['user_id'] = $userId;
+            $obj = new Shop();
+            $obj->fill($inputs);
+            $obj->save();
+            return response()->json(['message' => 'succes', 'status' => 1]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => 0], 500);
+        }
+        // rating-@ petq e hanel $inputs-ic. update mej nuynpes
     }
 
     /**
      * Display the specified resource.
      *
      * @param  \App\Models\Shop  $shop
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function show($id)
     {
         try {
-            $data['Shop data'] = Shop::findOrFail($id);
+            $shop = Shop::query()->findOrFail($id);
+            $products = Shop::query()->join('products', 'shops.id', '=', 'products.shop_id')->where('shops.id', '=', $id)->get();
 
-            $data['Product data'] = DB::table('products')
-                ->where('shop_id', '=', $id)
-                ->select('*')
-                ->paginate(5);
-
-            if ($data['Product data']->isEmpty()) {
-                $data['Product data'] = 'There are not any products in this shop.';
-            }
-
-            return \response()->json($data);
+            return response()->json([
+                'message' => 'succes',
+                'status' => 1,
+                'shop' => $shop,
+                'products' => $products
+            ]);
         } catch (\Exception $e) {
-            Log::error('Invalid id');
-            return response()->json("Invalid id, " . $e->getMessage());
+            Log::error($e->getMessage());
+            return response()->json(['message' => $e->getMessage(), 'status' => 0], 500);
         }
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Shop  $shop
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Shop $shop)
-    {
-        //
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\UpdateShopRequest  $request
      * @param  \App\Models\Shop  $shop
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
-    public function update(UpdateShopRequest $request, $id)
+    public function update(UpdateShopRequest $request, Shop $shop)
     {
-        try {
-            Shop::findOrFail($id)->update($request->all());
-            return response()->json('Changes made successfully.');
-        } catch (\Exception $e) {
-            Log::error("Invalid id, " . $e->getMessage());
-            return response()->json('Invalid Id ' . $e->getMessage());
-        }
-
+        //
     }
 
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Shop  $shop
-     * @return \Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Shop $shop)
     {
-        try {
-            Shop::findOrFail($id)->delete();
-            return response()->json("Deleted id $id.");
-        } catch (\Exception $e) {
-            Log::error("Invalid id, " . $e->getMessage());
-            return response()->json("Invalid id, " . $e->getMessage());
-        }
+        //
     }
 }

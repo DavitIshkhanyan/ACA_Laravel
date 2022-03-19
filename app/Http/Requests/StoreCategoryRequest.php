@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Mockery\Exception;
 
 class StoreCategoryRequest extends FormRequest
 {
@@ -13,7 +14,7 @@ class StoreCategoryRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize(): bool
+    public function authorize()
     {
         return true;
     }
@@ -23,11 +24,26 @@ class StoreCategoryRequest extends FormRequest
      *
      * @return array
      */
-    public function rules(): array
+    public function rules()
     {
         return [
-            'name' => 'required|unique:categories,name|min:3|max:255',
-            'parent_id' => 'nullable|exists:categories,id'
+            'name' => 'required|min:3|max:255',
+            'parent_id' => ['nullable', 'exists:categories,id'],
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+//          'name.min' => 'naasdsa',
+//          'name.max' => 'asdasdsad'
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+          'name' => 'anun',
         ];
     }
 

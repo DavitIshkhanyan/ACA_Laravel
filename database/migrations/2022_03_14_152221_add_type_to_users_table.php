@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCartsTable extends Migration
+class AddTypeToUsersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,8 @@ class CreateCartsTable extends Migration
      */
     public function up()
     {
-        Schema::create('carts', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
-            $table->integer('product_id');
-            $table->integer('count');
-            $table->timestamps();
+        Schema::table('users', function (Blueprint $table) {
+            $table->tinyInteger('type')->default(0)->after('email');
         });
     }
 
@@ -29,6 +25,8 @@ class CreateCartsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('carts');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('type');
+        });
     }
 }

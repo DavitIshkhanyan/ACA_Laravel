@@ -2,7 +2,6 @@
 
 namespace App\Http;
 
-
 use App\Http\Middleware\UserType;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 

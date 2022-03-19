@@ -2,27 +2,25 @@
 
 namespace App\Models;
 
-use Tymon\JWTAuth\Contracts\JWTSubject;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Authenticatable implements JWTSubject
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-
-    public const TYPE_SELLER = 1;
     public const TYPE_BUYER = 0;
-    public const SLUG_SELLER = 'seller';
+    public const TYPE_SELLER = 1;
     public const SLUG_BUYER = 'buyer';
+    public const SLUG_SELLER = 'seller';
     public const TYPE_SLUGS = [
         self::TYPE_BUYER => self::SLUG_BUYER,
         self::TYPE_SELLER => self::SLUG_SELLER
     ];
-
 
     /**
      * The attributes that are mass assignable.
@@ -33,10 +31,9 @@ class User extends Authenticatable implements JWTSubject
         'first_name',
         'last_name',
         'email',
-        'type',
         'gender',
-        'username',
-        'password'
+        'email_verified_at',
+        'password',
     ];
 
     /**
@@ -58,6 +55,8 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
     ];
 
+//////////
+    // Rest omitted for brevity
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.

@@ -2,167 +2,89 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Mockery\Exception;
 
 class UserController extends Controller
 {
+    public function create(Request $request)
+    {
+//        dd($request->user['first_name']);
+//        $user = new User();
+//        $user->first_name = $request->user['first_name'];
+//        $user->last_name = $request->user['last_name'];
+//        $user->email = $request->user['email'];
+//        $user->gender = $request->user['gender'];
+//        $user->password = $request->user['password'];
+//        $user->save();
 
-
-//    public function create (Request $request)
-//    {
-//        $newUser = new User();
-//        $newUser->fill([
-//            'first_name' => $request->first_name,
-//            'last_name' => $request->last_name,
-//            'email' => $request->email,
-//            'gender' => $request->gender,
-//            'username' => $request->username,
-//            'password' => bcrypt($request->password)
-//        ]);
-//        try {
-//            $newUser->save();
-//            return response()->json(['status'=>1, 'value'=>'created']);
-//        } catch (Exception $e) {
-//            echo $e->getMessage();
-//        }
-//
-//
+//        $user = new User($request->user['first_name'],$request->user['last_name'],$request->user['email'],$request->user['gender'],$request->user['password']);
 //        dd($request->all());
-//    }
-//
-//    public function showAll (Request $request)
-//    {
-//        return response()->json(User::all());
-//    }
-//
-//    public function show ($id)
-//    {
-//        return response()->json(User::find($id));
-//    }
-//
-//    public function update (Request $request, $id)
-//    {
-//        $user = User::find($id);
-//        $user->update(['email'=>$request->email]);
-//    }
-//
-//    public function delete ($id)
-//    {
-//        User::find($id)->delete();
-//    }
+
+//        User::create($request->user);
+//        User::create([
+//            'first_name' => $request->user['first_name'],
+//            'last_name' => $request->user['last_name'],
+//            'email' => $request->user['email'],
+//            'gender' => $request->user['gender'],
+//            'password' => $request->user['password'],
+//        ]);
 
 
 
-
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function index()
-    {
-
-        if (User::all()->isEmpty()) {
-            return response()->json([
-                'message' => 'No data to be shown.']);
+        try {
+            $inputs = $request->user;
+            $inputs['password'] = bcrypt($request->user['password']);
+            $obj = new User();
+            $obj->fill($inputs);
+            $obj->save();
+            return response()->json(['message' => 'succes', 'status' => 1]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => 0], 500);
         }
-        return response()->json([
-            'data' => User::all()]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
+    public function showAll()
     {
-
+        return response()->json([
+            'message' => 'success',
+            'status' => 1,
+            'items' => User::all()
+            ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function store(StoreUserRequest $request)
+    public function find($id)
     {
-        $request['password'] = bcrypt($request['password']);
-        User::create($request->all());
         return response()->json([
-            'New user added successfully.'
+            'message' => 'success',
+            'status' => 1,
+            'items' => User::find($id)
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function show($id)
+    public function update(Request $request, $id)
     {
-        try {
-            $data = User::findOrFail($id);
-            return \response()->json($data);
-        } catch (\Exception $e) {
-            return response()->json("Invalid id, " . $e->getMessage());
-        }
-
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function update(UpdateUserRequest $request, $id)
-    {
-
         try {
             $user = User::findOrFail($id);
-            if ($request['password']) {
-                $request['password'] = bcrypt($request['password']);
+            $updates = $request->user;
+            if (array_key_exists('password', $updates)) {
+                $updates['password'] = bcrypt($updates['password']);
             }
-            $user->update($request->all());
-            return response()->json('Changes made successfully.');
+            $user->fill($updates);
+            $user->update();
+            return response()->json(['message' => 'succes', 'status' => 1]);
         } catch (\Exception $e) {
-            return response()->json('Invalid id, ' . $e->getMessage());
+            return response()->json(['message' => $e->getMessage(), 'status' => 0], 500);
         }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function destroy($id)
+    public function delete($id)
     {
-        try {
-            User::findOrFail($id)->delete();
-            return response()->json("Deleted id $id.");
-        } catch (\Exception $e) {
-            return response()->json("Invalid id, " . $e->getMessage());
-        }
+        User::destroy($id);
+        return response()->json([
+            'message' => 'success',
+            'status' => '1'
+        ]);
     }
 }

@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers;
 
-
-use App\Http\Requests\StoreUserRequest;
-use App\Models\Cart;
+use App\Http\Requests\RegistrationRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use Tymon\JWTAuth\JWTAuth;
-
 
 class AuthController extends Controller
 {
-
-
     /**
      * Create a new AuthController instance.
      *
@@ -22,11 +18,8 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'registration']]);
     }
-
-
-
 
     /**
      * Get a JWT via given credentials.
@@ -43,7 +36,6 @@ class AuthController extends Controller
 
         return $this->respondWithToken($token);
     }
-
 
     /**
      * Get the authenticated User.
@@ -84,7 +76,7 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function respondWithToken($token)
+    protected function respondWithToken(string $token): JsonResponse
     {
         return response()->json([
             'access_token' => $token,
@@ -93,19 +85,27 @@ class AuthController extends Controller
         ]);
     }
 
-
-    public function register(StoreUserRequest $request)
+    public function registration(RegistrationRequest $request)
     {
+        try {
+            $inputs = $request->only(['first_name', 'last_name', 'email', 'type', 'gender', 'password']);
+            $inputs['password'] = bcrypt(request('password'));
+            $obj = new User();
+            $obj->fill($inputs);
+            $obj->save();
 
-        $request['password'] = bcrypt($request['password']);
-        User::create($request->all());
-
-        auth()->attempt(request(['email', 'password']));
-        if (User::TYPE_SLUGS[auth()->user()->type] == 'buyer') {
-            $cart['user_id'] = auth()->id();
-            Cart::create($cart);
+            $credentials = [
+                'email' => $inputs['email'],
+                'password' => $inputs['password']
+            ];
+            $token = $this->respondWithToken(auth()->attempt($credentials));
+            return response()->json([
+                'message' => 'success',
+                'token' => $token,
+                'status' => 1
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['message' => $e->getMessage(), 'status' => 0], 500);
         }
-
-        return $this->respondWithToken(auth()->attempt(request(['email', 'password'])));
     }
 }

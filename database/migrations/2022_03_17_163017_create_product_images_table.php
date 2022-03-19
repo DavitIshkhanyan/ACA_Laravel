@@ -17,9 +17,7 @@ class CreateProductImagesTable extends Migration
             $table->id();
             $table->integer('product_id');
             $table->tinyInteger('default')->default(0);
-            $table->integer('order')->nullable();
-            $table->string('path');
-            $table->string('name');
+//            $table->
             $table->timestamps();
         });
     }
