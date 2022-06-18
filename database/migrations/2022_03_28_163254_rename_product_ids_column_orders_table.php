@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateProductImagesTable extends Migration
+class RenameProductIdsColumnOrdersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,8 @@ class CreateProductImagesTable extends Migration
      */
     public function up()
     {
-        Schema::create('product_images', function (Blueprint $table) {
-            $table->id();
-            $table->integer('product_id');
-            $table->tinyInteger('default')->default(0);
-            $table->string('img_url');
-            $table->timestamps();
+        Schema::table('orders', function (Blueprint $table) {
+            $table->renameColumn('product_ids', 'products');
         });
     }
 
@@ -29,6 +25,8 @@ class CreateProductImagesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_images');
+        Schema::table('orders', function (Blueprint $table) {
+            $table->renameColumn('products', 'product_ids');
+        });
     }
 }

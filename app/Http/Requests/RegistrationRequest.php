@@ -31,6 +31,7 @@ class RegistrationRequest extends FormRequest
             'gender' => 'required|string',
             'email' => 'required|string|email|max:100|unique:users',
             'type' => 'required|in:' . implode(',', array_keys(User::TYPE_SLUGS)),
+//            'username' => 'required|string|unique:users,username|min:3|max:255', // avelacnel
             'password' => 'required|string|confirmed|min:6',
         ];
     }

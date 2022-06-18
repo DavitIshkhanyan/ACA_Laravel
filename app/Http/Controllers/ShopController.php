@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use App\Http\Requests\StoreShopRequest;
 use App\Http\Requests\UpdateShopRequest;
 use App\Models\Shop;
@@ -17,7 +18,18 @@ class ShopController extends Controller
      */
     public function index()
     {
-        //
+        return response()->json([
+            'status' => 1,
+            'data' => Shop::all()
+        ]);
+    }
+
+    public function getPopulars()
+    {
+        return response()->json([
+            'status' => 1,
+            'data' => DB::table('shops')->orderBy('rating', 'desc')->limit(10)->get()
+        ]);
     }
 
     /**
@@ -31,8 +43,8 @@ class ShopController extends Controller
     {
         try {
             $userId = auth()->id();
-//            $userId = auth()->user()->first_name;
-//            dd($userId);
+            //            $userId = auth()->user()->first_name;
+            //            dd($userId);
             $inputs = $request->all();
             $inputs['user_id'] = $userId;
             $obj = new Shop();

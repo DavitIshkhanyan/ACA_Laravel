@@ -19,7 +19,7 @@ class CategoryController extends Controller
     {
         return response()->json([
             'status' => trans('shop.success'),
-            'data' =>Category::all()
+            'data' => Category::all()
         ], JsonResponse::HTTP_OK);
     }
 

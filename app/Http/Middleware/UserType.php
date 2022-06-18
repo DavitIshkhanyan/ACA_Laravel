@@ -19,7 +19,7 @@ class UserType
     public function handle(Request $request, Closure $next, $type)
     {
 //        dd(auth());
-        if (User::TYPE_SLUGS[auth()->user()->{'type'}] === $type) {
+        if (User::TYPE_SLUGS[auth()->user()->type] === $type) {
             return $next($request);
         }
         abort(404);

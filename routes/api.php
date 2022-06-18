@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ShopController;
@@ -45,7 +46,9 @@ Route::delete('/users/{id}', [UserController::class, 'delete']);
 
 Route::resource('categories', CategoryController::class);
 
+Route::get('/shops/populars', [ShopController::class, 'getPopulars']);
 Route::apiResource('shops', ShopController::class);
+Route::get('/products/populars', [ProductController::class, 'getPopulars']);
 Route::apiResource('products', ProductController::class);
 
 
@@ -57,36 +60,17 @@ Route::group([
 
 ], function ($router) {
 
-//    Route::post('login', 'AuthController@login');
+    //    Route::post('login', 'AuthController@login');
     Route::post('login', [AuthController::class, 'login']);
     Route::post('registration', [AuthController::class, 'registration']);
-    Route::post('logout', 'AuthController@logout');
-    Route::post('refresh', 'AuthController@refresh');
-    Route::post('me', 'AuthController@me');
+    Route::post('logout', 'AuthController@logout'); ////
+    Route::post('refresh', 'AuthController@refresh'); /////
+    Route::post('me', 'AuthController@me'); //////
+
+    Route::apiResource('carts', CartController::class);
+    Route::post('carts/checkOut', [CartController::class, 'checkOut']);
 
     Route::group(['middleware' => 'userType:seller'], function () {
         Route::get('users', [UserController::class, 'showAll']);
     });
-
 });
-
-
-// ctrl + alt + l - uxxum e bacatner@, sxalner@ ete hnaravor e
-
-// karzina - tan@
-//product_id, user_id, count
-
-
-
-
-
-
-
-
-// product-i index-um veradarcnel shop-i tvyalner@,
-
-//user types - vacharox, gnord - user table-um avelacnel type
-
-
-
-// php artisan make:controller PhotoController --model=Photo --resource --requests
